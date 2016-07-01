@@ -9,6 +9,7 @@ import application.model.document.Outgoing;
 import application.model.document.Task;
 import application.model.staff.*;
 import application.serveces.DocService;
+import application.serveces.StaffService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -36,37 +37,10 @@ public class TestDoc {
         File file;
         int p;//переменная для хранения случайного значения
 
-        //считываем сохраняем данные из файлов
-        Map<String,Class>  staffMap = new HashMap<String,Class>();
-        staffMap.put("persons.xml", Persons.class);
-        staffMap.put("departments.xml", Departments.class);
-        staffMap.put("organizations.xml", Organizations.class);
-
-        for(Map.Entry entry:staffMap.entrySet()){
-            try {
-                file = new File(System.getProperty("user.dir")
-                        + File.separator + entry.getKey());
-                JAXBContext context = JAXBContext.newInstance((Class) entry.getValue());
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-                obj = (Object) unmarshaller.unmarshal(file);
-
-            } catch (JAXBException ex) {
-                Logger.getLogger(TestDoc.class.getName())
-                        .log(Level.SEVERE, null, ex);
-            }
-            if (obj instanceof Persons){
-                persons = (Persons)obj;
-            }else if (obj instanceof Departments) {
-                departments = (Departments) obj;
-            } else if (obj instanceof Organizations){
-                organizations = (Organizations) obj;
-            }
-        }
-
         //создаем экземпляр DocService
         DocService docService = new DocService();
         //сохраняем сотрудников в DocFieldStorage
-        docService.savePersons(persons);
+        docService.readFiles();
         //доп масссив для случайной генерации одного из документов
         Class[] classDoc = new Class[3];
         classDoc[0] = Task.class;
@@ -100,8 +74,8 @@ public class TestDoc {
         Gson gson = new Gson();
         String authorStr;
         String string;
-        String name1 = "e:\\java\\workspace\\app3\\";
-        String name2 = ".json";
+        String dirName = "e:\\java\\workspace\\app3\\";
+        String extension = ".json";
         // сортировка документов по автору
         for (Person author : docsByPersonMap.keySet()) {
             //очищаем строку
@@ -113,7 +87,7 @@ public class TestDoc {
                 string = string + gson.toJson(d);
             }
 
-            try (FileWriter fileWriter = new FileWriter(name1 + authorStr + name2)) {
+            try (FileWriter fileWriter = new FileWriter(dirName + authorStr + extension)) {
                 fileWriter.write(string);
             } catch (IOException ex) {
                 Logger.getLogger(TestDoc.class.getName())

@@ -80,8 +80,18 @@ public class DocFieldsStorage {
         Random random = new Random();
         return random.nextBoolean();
     }
-    public void getPerson(Integer i,Person p ){
+
+    public void setPersonDocStorage(HashMap<Integer, Person> personDocStorage) {
+        this.personDocStorage = personDocStorage;
+    }
+
+    public void addPersonToDocStorage(Integer i, Person p ){
         personDocStorage.put(i,p);
+    }
+
+    public HashMap<Integer, Person> getPersonDocStorage( ){
+
+        return personDocStorage;
     }
 
 
