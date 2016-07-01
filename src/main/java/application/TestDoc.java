@@ -100,14 +100,15 @@ public class TestDoc {
         Gson gson = new Gson();
         String authorStr;
         String string;
-        String name1 = "e:\\java\\app\\";
+        String name1 = "e:\\java\\workspace\\app3\\";
         String name2 = ".json";
         // сортировка документов по автору
         for (Person author : docsByPersonMap.keySet()) {
+            //очищаем строку
             string="";
             //сохраняем имя автора в переменную
             authorStr = author.getSurname() + " " + author.getName() + " " + author.getSecondName();
-            //добавляем
+            //добавляем документы в формате json в строку
             for (Document d : docsByPersonMap.get(author)) {
                 string = string + gson.toJson(d);
             }

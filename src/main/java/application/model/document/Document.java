@@ -101,12 +101,5 @@ public abstract class Document implements Comparable, Storable {
 
         return 0;
     }
-      /*  @Override
-    public String toString() {
-        String str ="идентификатор документа:"+id+"\nНазвание документа:"+nameDoc+"\nТекст документа:"+
-                text+"\nРегистрационный номер документа:"+registerNumOfDoc+"\nДата регистрации документа:"+
-                dateOfRegistration+"\nАвтор:"+author;
-        return str;
-    }
-*/
+
 }
