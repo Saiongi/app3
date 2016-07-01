@@ -1,0 +1,16 @@
+package application.model.staff;
+
+/**
+ * Created by Света on 28.06.2016.
+ */
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
+@XmlType(name = "Organizations")
+@XmlRootElement
+public class Organizations {
+    @XmlElementWrapper(name="organizations", nillable = true)
+    public List<Organization> organization = new ArrayList<Organization>();
+}
