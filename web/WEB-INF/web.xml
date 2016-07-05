@@ -5,13 +5,13 @@
          version="3.1">
 
     <servlet>
-        <servlet-name>PersonServlet</servlet-name>
-        <servlet-class>application.servlets.PersonServlet</servlet-class>
+        <servlet-name>myServlet</servlet-name>
+        <servlet-class>application.servlets.MyServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>PersonServlet</servlet-name>
-        <url-pattern>/main</url-pattern>
+        <servlet-name>myServlet</servlet-name>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
 

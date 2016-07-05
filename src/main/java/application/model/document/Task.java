@@ -71,26 +71,7 @@ public class Task extends Document {
         return str;
     }
 
-    /*
-     @Override
-     public int compareTo(Object obj) {
-         Document entry = (Document) obj;
-         int result = getAuthor().compareTo(entry.getAuthor());
-         if (result!=0){
-             return result;
-         }
-         result = getDateOfRegistration().compareTo(entry.getDateOfRegistration());
-         if(result != 0) {
-             return result;
-         }
-         result = getRegisterNumOfDoc().compareTo(entry.getRegisterNumOfDoc());
-         if(result != 0) {
-             return result;
-         }
 
-         return 0;
-     }
-    */
 
 
 }

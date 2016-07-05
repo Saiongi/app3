@@ -30,11 +30,7 @@ import static javax.script.ScriptEngine.FILENAME;
 public class TestDoc {
 
     public static void main(String[] args) throws IOException {
-        Persons persons = null;
-        Departments departments=null;
-        Organizations organizations=null;
-        Object obj=null;
-        File file;
+
         int p;//переменная для хранения случайного значения
 
         //создаем экземпляр DocService
@@ -57,9 +53,7 @@ public class TestDoc {
             }
         }
         //выводим документы в консоль
-        for (Document d : allDoc) {
-            //    System.out.println(d.toString());
-        }
+
         Map<Person, TreeSet<Document>> docsByPersonMap = new TreeMap<Person, TreeSet<Document>>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         //сортируем документы по авторам
@@ -69,30 +63,44 @@ public class TestDoc {
             }
             docsByPersonMap.get(d.getAuthor()).add(d);
         }
+
         //генерируем отчеты по каждому автору в json файлы
         GsonBuilder builder = new GsonBuilder();
         Gson gson = new Gson();
         String authorStr;
-        String string;
+        String stringInJSON;
         String dirName = "e:\\java\\workspace\\app3\\";
         String extension = ".json";
         // сортировка документов по автору
         for (Person author : docsByPersonMap.keySet()) {
             //очищаем строку
-            string="";
+            stringInJSON="";
             //сохраняем имя автора в переменную
             authorStr = author.getSurname() + " " + author.getName() + " " + author.getSecondName();
             //добавляем документы в формате json в строку
             for (Document d : docsByPersonMap.get(author)) {
-                string = string + gson.toJson(d);
+                stringInJSON = stringInJSON + gson.toJson(d);
             }
 
             try (FileWriter fileWriter = new FileWriter(dirName + authorStr + extension)) {
-                fileWriter.write(string);
+                fileWriter.write(stringInJSON);
             } catch (IOException ex) {
                 Logger.getLogger(TestDoc.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
+        }
+
+        //очищаем строку
+        stringInJSON="";
+        for (Person person : docService.getDocFieldsStorage().getPersonDocStorage().values()) {
+            //добавляем сотрудников в формате json в строку
+                stringInJSON = stringInJSON + gson.toJson(person);
+        }
+        try (FileWriter fileWriter = new FileWriter(dirName+"Persons"+ extension)) {
+            fileWriter.write(stringInJSON);
+        } catch (IOException ex) {
+            Logger.getLogger(TestDoc.class.getName())
+                    .log(Level.SEVERE, null, ex);
         }
     }
 }
