@@ -9,6 +9,7 @@ import application.model.document.Outgoing;
 import application.model.document.Task;
 import application.model.staff.*;
 import application.serveces.DocService;
+import application.serveces.FileService;
 import application.serveces.StaffService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,15 +29,24 @@ import static javax.script.ScriptEngine.FILENAME;
 
 
 public class TestDoc {
-
+/*
     public static void main(String[] args) throws IOException {
+        //1. сохраняем данные из файлов(пока только персонал )
+        //Перенести в точку входа map
+        //Создаем hashmap для хранения классов и названий файлов
+        Map<String,Class> staffMap = new HashMap<String,Class>();
+        staffMap.put("persons.xml", Persons.class);
+        staffMap.put("departments.xml", Departments.class);
+        staffMap.put("organizations.xml", Organizations.class);
 
-        int p;//переменная для хранения случайного значения
-
+        FileService fileService = new FileService();
+         Persons persons =  fileService.readFiles(staffMap);
         //создаем экземпляр DocService
         DocService docService = new DocService();
-        //сохраняем сотрудников в DocFieldStorage
-        docService.readFiles();
+        //сохраняем persons в docfieldStorage
+        docService.savePersons(persons);
+
+
         //доп масссив для случайной генерации одного из документов
         Class[] classDoc = new Class[3];
         classDoc[0] = Task.class;
@@ -44,6 +54,7 @@ public class TestDoc {
         classDoc[2] = Incoming.class;
         //создаем TreeSet для хранения документов
         TreeSet<Document> allDoc = new TreeSet<Document>();
+        int p;//переменная для хранения случайного значения
         //создаем документы
         for (int i = 0; i < 30; i++) {
             p = (int) (Math.random() * 3);
@@ -52,7 +63,6 @@ public class TestDoc {
                 allDoc.add(doc);
             }
         }
-        //выводим документы в консоль
 
         Map<Person, TreeSet<Document>> docsByPersonMap = new TreeMap<Person, TreeSet<Document>>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -103,5 +113,8 @@ public class TestDoc {
                     .log(Level.SEVERE, null, ex);
         }
     }
+
+
+*/
 }
 

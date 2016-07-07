@@ -96,7 +96,7 @@ public class DocFieldsStorage {
 
 
 
-    public void saveDocField(Document doc){
+    public void recordDatesInFields(Document doc){
         doc.setText(textStorage.get((int)(Math.random()*5)));
         doc.setAuthor(personDocStorage.get((int)(Math.random()*personDocStorage.size())));
         doc.setId(getId());

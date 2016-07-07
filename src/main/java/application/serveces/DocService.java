@@ -81,7 +81,7 @@ public class DocService {
 
     public Document createDoc(Class aClass) {
         Document doc = documentFactory.createDocument(aClass);
-        docFieldsStorage.saveDocField(doc);
+        docFieldsStorage.recordDatesInFields(doc);
         try {
             regDoc(doc);
             return doc;
@@ -98,51 +98,4 @@ public class DocService {
         }
 
     }
-
-    public void readFiles(){
-        //считываем сохраняем данные из файлов
-        //Создаем hashmap для хранения классов и названий файлов
-        Map<String,Class> staffMap = new HashMap<String,Class>();
-        staffMap.put("persons.xml", Persons.class);
-        staffMap.put("departments.xml", Departments.class);
-        staffMap.put("organizations.xml", Organizations.class);
-        //читаем файлы
-        for(Map.Entry entry:staffMap.entrySet()){
-            try {
-                //записываем выбранный файл
-                file = new File(System.getProperty("user.dir")
-                        + File.separator + entry.getKey());
-                // создаем образец контекста и передаем Class объекта с которым будем работать
-                JAXBContext context = JAXBContext.newInstance((Class) entry.getValue());
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-                // сохраняем данные в объект
-                obj = (Object) unmarshaller.unmarshal(file);
-
-            } catch (JAXBException ex) {
-                Logger.getLogger(TestDoc.class.getName())
-                        .log(Level.SEVERE, null, ex);
-            }
-            //Сохраняем объект в зависимости от его класса
-            if (obj instanceof Persons){
-                persons = (Persons)obj;
-            }else if (obj instanceof Departments) {
-                departments = (Departments) obj;
-            } else if (obj instanceof Organizations){
-                organizations = (Organizations) obj;
-            }
-        }
-
-        //сохраняем сотрудников в DocFieldStorage
-        savePersons(persons);
-    }
-
-
-
-
-
-
-
-
-
-
 }
