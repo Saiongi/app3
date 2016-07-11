@@ -1,11 +1,13 @@
 package application.servlets;
 
 
-import application.serveces.StaffController;
+import application.serveces.StaffService;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ApplicationPath;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -16,7 +18,7 @@ public class WebApplication extends Application{
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(StaffController.class);
+        classes.add(StaffService.class);
         return classes;
     }
 
