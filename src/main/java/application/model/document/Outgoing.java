@@ -5,9 +5,13 @@ package application.model.document;
  */
 import application.model.staff.Person;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Created by Света on 20.06.2016.
  */
+@XmlType(name = "Outgoing")
 public class Outgoing extends Document {
     private Person destination;  //адресат
     private String deliveryMethod;  //способ доставки
@@ -21,6 +25,7 @@ public class Outgoing extends Document {
     public Person getDestination(){
         return this.destination;
     }
+    @XmlElement
     public void setDestination(Person destination) {
         this.destination = destination;
     }
@@ -28,6 +33,7 @@ public class Outgoing extends Document {
     public String getDeliveryMethod(){
         return this.deliveryMethod;
     }
+    @XmlElement
     public void setDeliveryMethod(String deliveryMethod) {
         this.deliveryMethod = deliveryMethod;
     }

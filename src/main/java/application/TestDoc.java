@@ -35,16 +35,16 @@ public class TestDoc {
         //Перенести в точку входа map
         //Создаем hashmap для хранения классов и названий файлов
         Map<String,Class> staffMap = new HashMap<String,Class>();
-        staffMap.put("persons.xml", Persons.class);
+        staffMap.put("person.xml", Persons.class);
         staffMap.put("departments.xml", Departments.class);
         staffMap.put("organizations.xml", Organizations.class);
 
         FileService fileService = new FileService();
-         Persons persons =  fileService.readFiles(staffMap);
+         Persons person =  fileService.readFiles(staffMap);
         //создаем экземпляр DocService
         DocService docService = new DocService();
-        //сохраняем persons в docfieldStorage
-        docService.savePersons(persons);
+        //сохраняем person в docfieldStorage
+        docService.savePersons(person);
 
 
         //доп масссив для случайной генерации одного из документов

@@ -5,7 +5,10 @@ package application.model.document;
  */
 import application.model.staff.Person;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
+@XmlType(name = "Incoming")
 public class Incoming extends Document {
     private Person sender;  //отправитель;
     private Person destination; //адресат;
@@ -21,7 +24,7 @@ public class Incoming extends Document {
     public Person getSender(){
         return this.sender;
     }
-
+    @XmlElement
     public void setSender(Person sender) {
         this.sender = sender;
     }
@@ -29,7 +32,7 @@ public class Incoming extends Document {
     public Person getDestination(){
         return this.destination;
     }
-
+    @XmlElement
     public void setDestination(Person destination) {
         this.destination = destination;
     }
@@ -37,7 +40,7 @@ public class Incoming extends Document {
     public int getIncomeNumber(){
         return this.incomeNumber;
     }
-
+    @XmlElement
     public void setIncomeNumber(int incomeNumber) {
         this.incomeNumber = incomeNumber;
     }
@@ -45,7 +48,7 @@ public class Incoming extends Document {
     public Date getIncomeDateOfRegistration(){
         return this.incomeDateOfRegistration;
     }
-
+    @XmlElement
     public void setIncomeDateOfRegistration(Date incomeDateOfRegistration) {
         this.incomeDateOfRegistration = incomeDateOfRegistration;
     }

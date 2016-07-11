@@ -9,16 +9,10 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlType(name = "Persons")
-@XmlRootElement
-public class Persons {
-    @XmlElementWrapper(name="person", nillable = true)
-    public List<Person> persons = new ArrayList<Person>();
 
-    public List<Person> getPersons() {
-        return persons;
-    }
-    public void setPersons(List<Person> persons) {
-        this.persons = persons;
-    }
+@XmlRootElement(name = "Persons")
+public class Persons {
+    @XmlElementWrapper(name = "personList", nillable = true)
+    public List<Person> person = new ArrayList<Person>();
+
 }

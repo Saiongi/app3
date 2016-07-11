@@ -1,18 +1,17 @@
 package application.serveces;
 
-import application.TestDoc;
-import application.model.staff.Departments;
-import application.model.staff.Organizations;
-import application.model.staff.Persons;
-import application.model.staff.Staff;
-import com.google.gson.Gson;
+import application.model.document.Document;
+import application.model.document.Incoming;
+import application.model.document.Outgoing;
+import application.model.document.Task;
+import application.model.staff.*;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +21,7 @@ import java.util.logging.Logger;
 
 public class FileService {
     // переменная для хранения Persons
-    Persons persons;
+    Collection<Person> personsCollection;
     // переменная для хранения Departments
     Departments departments;
     // переменная для хранения Organizations
@@ -32,55 +31,84 @@ public class FileService {
     // переменная для хранения файлов
     File file;
     DocService docService;
+    Persons persons;
+    //для хранения документов
+    TreeSet<Document> allDoc;
+    //для хранения документов с искомым id
+    TreeSet<Document> idFindDoc;
+FileService() throws URISyntaxException {
 
-
-FileService(){
-    //1. сохраняем данные из файлов(пока только персонал
-    //Создаем hashmap для хранения классов и названий файлов
-    Map<String,Class> staffMap = new HashMap<String,Class>();
-    staffMap.put("persons.xml", Persons.class);
-    staffMap.put("departments.xml", Departments.class);
-    staffMap.put("organizations.xml", Organizations.class);
-
-   // FileService fileService = new FileService();
-    persons =  readFiles(staffMap);
+    personsCollection = readFiles();
     //создаем экземпляр DocService
-   // docService = new DocService();
-    //сохраняем persons в docfieldStorage
-   // docService.savePersons(persons);
-
+    docService = new DocService();
+    //сохраняем person в docFieldStorage
+    docService.savePersons(persons);
+    //создаем документы
+     allDoc = createDocuments();
 }
-
-    public Persons readFiles(Map<String,Class> staffMap){
-        //считываем сохраняем данные из файлов
-
-        //читаем файлы
-        for(Map.Entry entry:staffMap.entrySet()){
-            try {
-                //записываем выбранный файл
-                file = new File(System.getProperty("user.dir")
-                        + File.separator + entry.getKey());
-                // создаем образец контекста и передаем Class объекта с которым будем работать
-                JAXBContext context = JAXBContext.newInstance((Class) entry.getValue());
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-                // сохраняем данные в объект
-                obj = (Object) unmarshaller.unmarshal(file);
-
-            } catch (JAXBException ex) {
-                Logger.getLogger(TestDoc.class.getName())
-                        .log(Level.SEVERE, null, ex);
+    //считываем person.xml
+    public Collection<Person> readFiles() throws URISyntaxException {
+                try {
+                    ClassLoader classLoader = getClass().getClassLoader();
+                    URL url = classLoader.getResource("person.xml");
+                    file = new File(url.getPath());
+                    JAXBContext jaxbContext = JAXBContext.newInstance(Persons.class);
+                    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                    Object o = jaxbUnmarshaller.unmarshal(file);
+                     persons = (Persons) o;
+                    return persons.person;
+                } catch (Exception ex) {
+                    Logger.getLogger(FileService.class.getName())
+                            .log(Level.SEVERE, null, ex);
+                }
+                //если неудача - возвращаем null
+            return null;
             }
-            //Сохраняем объект в зависимости от его класса
-            if (obj instanceof Persons){
-                persons = (Persons)obj;
-            }else if (obj instanceof Departments) {
-                departments = (Departments) obj;
-            } else if (obj instanceof Organizations){
-                organizations = (Organizations) obj;
+    //ищем документ по id
+    public TreeSet<Document> findDocId(TreeSet<Document> allDoc, int findId){
+        Map<Integer, TreeSet<Document>> docsByPersonMap = new TreeMap<Integer, TreeSet<Document>>();
+
+        //сортируем документ по Id автора
+        for (Document d: allDoc) {
+            if (! docsByPersonMap.containsKey(d.getAuthor().getId())){
+                docsByPersonMap.put(d.getAuthor().getId(), new TreeSet<Document>());
             }
+            docsByPersonMap.get(d.getAuthor().getId()).add(d);
         }
 
-        return persons;
-     }
+        // Ищем документы по  искомому id и записываем их в treeset idFindDoc
+        for (Integer id : docsByPersonMap.keySet()){
+              if (id==findId) {
+                  idFindDoc = docsByPersonMap.get(id);
+              }
+        }
+        //если документов в treset не записалось,
+        // т.е. не найдены документы с автром с искомым id тогда возвращаем null
+        if (idFindDoc.isEmpty()) {
+            return null;
+        //если документы найдены , возвращаем коллекцию
+       }else return idFindDoc;
+    }
+
+    public TreeSet<Document>  createDocuments(){
+        //доп масссив для случайной генерации одного из документов
+        Class[] classDoc = new Class[3];
+        classDoc[0] = Task.class;
+        classDoc[1] = Outgoing.class;
+        classDoc[2] = Incoming.class;
+        //создаем TreeSet для хранения документов
+        TreeSet<Document> allDoc = new TreeSet<Document>();
+        int p;//переменная для хранения случайного значения
+        //создаем документы
+        for (int i = 0; i < 30; i++) {
+            p = (int) (Math.random() * 3);
+            Document doc = docService.createDoc(classDoc[p]);
+            if (doc != null) {
+                allDoc.add(doc);
+            }
+        }
+        //возвращаем TreeSet с документами
+        return allDoc;
+    }
 
 }

@@ -3,9 +3,15 @@ package application.model.document;
 /**
  * Created by Света on 01.07.2016.
  */
+
+import javax.xml.bind.annotation.XmlType;
+
+
 import application.model.staff.Person;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.util.Date;
+@XmlType(name = "Task")
 public class Task extends Document {
     private Date date;  //дата выдачи поручения;
     private Date  period; //срок исполнения поручения; - до такой то даты
@@ -21,6 +27,7 @@ public class Task extends Document {
     public Date getDate(){
         return this.date;
     }
+    @XmlElement
     public void setDate(Date date) {
         this.date = date;
     }
@@ -28,6 +35,7 @@ public class Task extends Document {
     public Date getPeriod(){
         return this.period;
     }
+    @XmlElement
     public void setPeriod(Date period) {
         this.period = period;
     }
@@ -35,6 +43,7 @@ public class Task extends Document {
     public Person getExecutor(){
         return this.executor;
     }
+    @XmlElement
     public void setExecutor(Person executor) {
         this.executor = executor;
     }
@@ -42,6 +51,7 @@ public class Task extends Document {
     public boolean getControl(){
         return this.control;
     }
+    @XmlElement
     public void setControl(boolean control) {
         this.control = control;
     }
@@ -49,6 +59,7 @@ public class Task extends Document {
     public Person getControllerName(){
         return this.controllerName;
     }
+    @XmlElement
     public void setControllerName(Person controllerName) {
         this.controllerName = controllerName;
     }

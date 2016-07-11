@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
  * Created by Света on 26.06.2016.
  */
 
-@XmlType(name = "persons")
+@XmlType(name = "person")
 public class Person extends Staff implements Comparable {
 
     private String surname;   //поле фамилия;

@@ -4,6 +4,8 @@ package application.model.document;
 import application.model.Storable;
 import application.model.staff.Person;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
 /**
@@ -12,6 +14,7 @@ import java.util.Date;
  * и  Регистрационный номер. Реализует интерфейс Storable, который
  * в дальнейшем будет использован для сохранения документов.
  */
+@XmlRootElement(name = "document")
 public abstract class Document implements Comparable, Storable {
     //идентификатор документа;
     private int id;
@@ -35,6 +38,7 @@ public abstract class Document implements Comparable, Storable {
     public int getId(){
         return this.id;
     }
+    @XmlElement
     public void setId(int id){
         this.id=id;
     }
@@ -42,12 +46,14 @@ public abstract class Document implements Comparable, Storable {
     public String getNameDoc(){
         return this.nameDoc;
     }
+    @XmlElement
     public void setNameDoc(String nameDoc){
         this.nameDoc = nameDoc;
     }
     public String getText(){
         return this.text;
     }
+    @XmlElement
     public void setText(String text){
         this.text=text;
     }
@@ -55,6 +61,7 @@ public abstract class Document implements Comparable, Storable {
     public String getRegisterNumOfDoc(){
         return this.registerNumOfDoc;
     }
+    @XmlElement
     public void setRegisterNumOfDoc(String registerNumOfDoc ){
         this.registerNumOfDoc = registerNumOfDoc;
     }
@@ -62,6 +69,7 @@ public abstract class Document implements Comparable, Storable {
     public Date getDateOfRegistration(){
         return this.dateOfRegistration;
     }
+    @XmlElement
     public void setDateOfRegistration(Date dateOfRegistration){
         this.dateOfRegistration = dateOfRegistration;
     }
@@ -69,6 +77,7 @@ public abstract class Document implements Comparable, Storable {
     public Person getAuthor(){
         return this.author;
     }
+    @XmlElement
     public void setAuthor(Person author) {
         this.author = author;
     }

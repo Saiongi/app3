@@ -5,14 +5,9 @@ package application.serveces;
  */
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import application.DocFieldsStorage;
-import application.TestDoc;
 import application.model.document.Document;
 import application.model.document.DocumentExistsException;
 import application.model.staff.Departments;
@@ -21,10 +16,6 @@ import application.model.staff.Person;
 import application.model.staff.Persons;
 import application.serveces.factories.DocumentFactory;
 import com.google.gson.Gson;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 /**
  * Created by Света on 22.06.2016.
@@ -92,10 +83,9 @@ public class DocService {
     }
     public void savePersons(Persons persons){
         int i=0;
-        for (Person person: persons.persons) {
+        for (Person person: persons.person) {
             docFieldsStorage.addPersonToDocStorage(i, person);
             i++;
         }
-
     }
 }
