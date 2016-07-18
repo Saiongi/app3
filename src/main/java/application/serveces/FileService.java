@@ -1,6 +1,9 @@
 package application.serveces;
 
-import application.model.document.*;
+import application.model.document.Document;
+import application.model.document.Incoming;
+import application.model.document.Outgoing;
+import application.model.document.Task;
 import application.model.staff.*;
 
 import javax.xml.bind.JAXBContext;
@@ -8,10 +11,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +21,8 @@ import java.util.logging.Logger;
  */
 
 public class FileService {
-    private static Connection con;
+
+     private static Connection con = null;
     // переменная для хранения Persons
     Collection<Person> personsCollection;
     // переменная для хранения Departments
@@ -31,7 +32,6 @@ public class FileService {
     //переменная для хранения объектов
     Object obj;
     // переменная для хранения файлов
-
     File file;
     DocService docService;
     Persons persons;
@@ -54,11 +54,7 @@ FileService() throws URISyntaxException {
                 try {
                     ClassLoader classLoader = getClass().getClassLoader();
                     URL url = classLoader.getResource("person.xml");
-                    if (url != null) {
-                        file = new File(url.getPath());
-                    }else{
-                        throw new NotFoundException("File is not found!");
-                    }
+                    file = new File(url.getPath());
                     JAXBContext jaxbContext = JAXBContext.newInstance(Persons.class);
                     Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                     Object o = jaxbUnmarshaller.unmarshal(file);
@@ -119,42 +115,36 @@ FileService() throws URISyntaxException {
     }
 
     public void insertPerson(Person person) throws SQLException {
+
         PreparedStatement stmt = null;
-        try {
+
             stmt = con.prepareStatement(
-                    "INSERT INTO staff.person " +
+                    "INSERT INTO person " +
                             "(id, name, secondname, surname, position) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?)");
+                            "VALUES (?, ?, ?, ?, ?)");
             stmt.setInt(1, person.getId());
             stmt.setString(2, person.getName());
             stmt.setString(3, person.getSecondName());
             stmt.setString(4, person.getSurname());
             stmt.setString(5, person.getPosition());
             stmt.execute();
-        } finally {
-            if (stmt != null) {
-                stmt.close();
-            }
-        }
     }
 
     public void insertPersonFromPersonsCollection() throws SQLException {
         //Создаем соединение с бд
         con = null;
         //URL к базе состоит из протокола:подпротокола://[хоста]:[порта_СУБД]/[БД] и других_сведений
-        String url = "jdbc:derby://localhost:1527/appbase";
+        String url = "jdbc:derby:appBase;create=true";
+        //String url = "jdbc:derby://localhost:1527/appBase;create=true";
         //Имя пользователя БД
-      //  String name = "user";
+        //  String name = "user";
         //Пароль
-       // String password = "123456";
+        // String password = "123456";
         try {
             //Загружаем драйвер
             Class.forName("org.apache.derby.jdbc.ClientDriver");
-            // System.out.println("Драйвер подключен");
             //Создаём соединение
             con = DriverManager.getConnection(url);
-            //  System.out.println("Соединение установлено");
-
             //записываем данные в бд
             for (Person p: persons.person){
                 insertPerson(p);
@@ -162,16 +152,53 @@ FileService() throws URISyntaxException {
 
         } catch (Exception ex) {
             //выводим наиболее значимые сообщения
-            Logger.getLogger(JDBCTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (con != null) {
                 try {
                     con.close();
                 } catch (SQLException ex) {
-                    Logger.getLogger(JDBCTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
 
     }
+
+    public  void createDBConnection() {
+        DerbyDBManager db = new DerbyDBManager("ApplicationDB");
+
+        try {
+            try {
+                // запись данных в таблицу
+
+                fillDB(db, persons);
+            } catch (SQLException e) {
+                // если БД не существовала, то создаем таблицу
+                // и после этого заполняем её значениями
+                db.executeUpdate("CREATE TABLE Person(id int, name varchar(128)," +
+                        " secondname varchar(128), surname varchar(128), position varchar(128))");
+                fillDB(db, persons);
+
+            }
+            //вывод данных
+            ResultSet rs = db.executeQuery("SELECT * FROM Person");
+            String dataFromTable="";
+            while(rs.next()) {
+
+                dataFromTable=dataFromTable+rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getString(4)+" "+rs.getString(5);
+            }
+            String pr = dataFromTable;
+            int p=0;
+
+        } catch (SQLException e) {
+            Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
+
+    public  void fillDB(DerbyDBManager db, Persons persons) throws SQLException {
+        db.executeUpdatePersons(persons);
+    }
+
+
 }
