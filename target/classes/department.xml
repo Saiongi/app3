@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <departments>
-    <departments>
+    <departmentList>
         <department>
             <id>1</id>
             <boss>Кудрявцев Сергей Анатоольевич</boss>
@@ -111,5 +111,5 @@
                 <telNumbers>2310421</telNumbers>
             </telNumbers>
         </department>
-    </departments>
+    </departmentList>
 </departments>

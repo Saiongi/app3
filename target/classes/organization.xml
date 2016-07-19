@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <organizations>
-    <organization>
+    <organizationList>
         <organization>
             <id>1</id>
             <orgBoss>Александров Вадим Анатоольевич</orgBoss>
@@ -111,5 +111,5 @@
             </orgTelNumbers>
             <shortName>Башавтотранс</shortName>
         </organization>
-    </organization>
+    </organizationList>
 </organizations>

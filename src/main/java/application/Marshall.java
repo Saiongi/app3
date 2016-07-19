@@ -1,10 +1,13 @@
 package application;
+import application.model.staff.Department;
+import application.model.staff.Departments;
 import application.model.staff.Person;
 import application.model.staff.Persons;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +17,17 @@ import java.util.logging.Logger;
 public class Marshall {
 
     public static void main(String[] args) {
+        ArrayList<Integer> list = new ArrayList<Integer>(5);
+        list.clear();
+        list.add(1403897);
+        list.add(1403837);
+        list.add(1403827);
+        Departments departments = new Departments();
+        Department depart = new Department();
+        departments.department.add(depart.createDep(1, "Департамент управления делами и контроля", "Департамент УДК",
+                "Кудрявцев Сергей Анатоольевич", list));
+
+      /*
         Person pers = new Person();
         pers.setId(1);
         pers.setSurname("Захарова");
@@ -30,16 +44,16 @@ public class Marshall {
         Persons person = new Persons();
         person.person.add(pers);
         person.person.add(pers2);
-
+*/
 
         try {
             File file = new File(System.getProperty("user.dir")
-                    + File.separator + "person.xml");
-            JAXBContext context = JAXBContext.newInstance(Persons.class);
+                    + File.separator + "department.xml");
+            JAXBContext context = JAXBContext.newInstance(Departments.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(person, file);
-            marshaller.marshal(person, System.out);
+            marshaller.marshal(departments, file);
+            marshaller.marshal(departments, System.out);
         } catch (JAXBException ex) {
             Logger.getLogger(Marshall.class.getName())
                     .log(Level.SEVERE, null, ex);

@@ -47,4 +47,16 @@ public class Organization extends Staff  {
     public void setOrgTelNumbers(ArrayList<Integer> orgTelNumbers){
         this.orgTelNumbers = orgTelNumbers;
     }
+
+    public Organization createOrg(int id,String orgName,String shortName, String orgBoss,
+                                ArrayList<Integer> orgTelNumbers ) {
+        Organization organization = new Organization();
+        organization.setId(id);
+        organization.setOrgName(orgName);
+        organization.setShortName(shortName);
+        organization.setOrgBoss(orgBoss);
+        organization.setOrgTelNumbers(orgTelNumbers);
+        return organization;
+
+    }
 }

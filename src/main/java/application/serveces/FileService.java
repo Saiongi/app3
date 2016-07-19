@@ -7,6 +7,7 @@ import application.model.document.Task;
 import application.model.staff.*;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -21,6 +22,8 @@ import java.util.logging.Logger;
  */
 
 public class FileService {
+
+
 
      private static Connection con = null;
     // переменная для хранения Persons
@@ -39,34 +42,62 @@ public class FileService {
     TreeSet<Document> allDoc;
     //для хранения документов с искомым id
     TreeSet<Document> idFindDoc;
+
+    DerbyDBManager db;
 FileService() throws URISyntaxException {
 
-    personsCollection = readFiles();
+    this.readFiles();
+    personsCollection = persons.person;
     //создаем экземпляр DocService
     docService = new DocService();
     //сохраняем person в docFieldStorage
     docService.savePersons(persons);
+    //создаем класс derbymanager и передаем ему имя бд
+    db = new DerbyDBManager("ApplicationDB");
     //создаем документы
      allDoc = createDocuments();
+
 }
-    //считываем person.xml
-    public Collection<Person> readFiles() throws URISyntaxException {
-                try {
-                    ClassLoader classLoader = getClass().getClassLoader();
-                    URL url = classLoader.getResource("person.xml");
-                    file = new File(url.getPath());
-                    JAXBContext jaxbContext = JAXBContext.newInstance(Persons.class);
-                    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                    Object o = jaxbUnmarshaller.unmarshal(file);
-                     persons = (Persons) o;
-                    return persons.person;
-                } catch (Exception ex) {
-                    Logger.getLogger(FileService.class.getName())
-                            .log(Level.SEVERE, null, ex);
-                }
-                //если неудача - возвращаем null
-            return null;
+
+    public void readFiles() {
+        //считываем сохраняем данные из файлов
+        //Создаем hashmap для хранения классов и названий файлов
+        Map<String, Class> staffMap = new HashMap<String, Class>();
+        staffMap.put("person.xml", Persons.class);
+        staffMap.put("department.xml", Departments.class);
+        staffMap.put("organization.xml", Organizations.class);
+        //читаем файлы
+        String fileName;
+        for (Map.Entry entry : staffMap.entrySet()) {
+            try {
+                fileName = entry.getKey().toString();
+                ClassLoader classLoader = getClass().getClassLoader();
+
+                URL url = classLoader.getResource(fileName);
+                //записываем выбранный файл
+                file = new File(url.getPath());
+                // создаем образец контекста и передаем Class объекта с которым будем работать
+                JAXBContext context = JAXBContext.newInstance((Class) entry.getValue());
+                Unmarshaller unmarshaller = context.createUnmarshaller();
+                // сохраняем данные в объект
+                obj = (Object) unmarshaller.unmarshal(file);
+
+            } catch (JAXBException ex) {
+                Logger.getLogger(FileService.class.getName())
+                        .log(Level.SEVERE, null, ex);
             }
+            //Сохраняем объект в зависимости от его класса
+            if (obj instanceof Persons) {
+                persons = (Persons) obj;
+            } else if (obj instanceof Departments) {
+                departments = (Departments) obj;
+            } else if (obj instanceof Organizations) {
+                organizations = (Organizations) obj;
+            }
+        }
+
+    }
+
     //ищем документ по id
     public TreeSet<Document> findDocId(TreeSet<Document> allDoc, int findId){
         Map<Integer, TreeSet<Document>> docsByPersonMap = new TreeMap<Integer, TreeSet<Document>>();
@@ -130,48 +161,13 @@ FileService() throws URISyntaxException {
             stmt.execute();
     }
 
-    public void insertPersonFromPersonsCollection() throws SQLException {
-        //Создаем соединение с бд
-        con = null;
-        //URL к базе состоит из протокола:подпротокола://[хоста]:[порта_СУБД]/[БД] и других_сведений
-        String url = "jdbc:derby:appBase;create=true";
-        //String url = "jdbc:derby://localhost:1527/appBase;create=true";
-        //Имя пользователя БД
-        //  String name = "user";
-        //Пароль
-        // String password = "123456";
-        try {
-            //Загружаем драйвер
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
-            //Создаём соединение
-            con = DriverManager.getConnection(url);
-            //записываем данные в бд
-            for (Person p: persons.person){
-                insertPerson(p);
-            }
-
-        } catch (Exception ex) {
-            //выводим наиболее значимые сообщения
-            Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-
-    }
-
     public  void createDBConnection() {
-        DerbyDBManager db = new DerbyDBManager("ApplicationDB");
+
 
         try {
+
             try {
                 // запись данных в таблицу
-
                 fillDB(db, persons);
             } catch (SQLException e) {
                 // если БД не существовала, то создаем таблицу
@@ -179,26 +175,75 @@ FileService() throws URISyntaxException {
                 db.executeUpdate("CREATE TABLE Person(id int, name varchar(128)," +
                         " secondname varchar(128), surname varchar(128), position varchar(128))");
                 fillDB(db, persons);
-
             }
+
+            try {
+                // запись данных в таблицу
+                fillDB(db,organizations);
+            } catch (SQLException e) {
+                // если БД не существовала или нет таблицы, то создаем таблицу
+                // и после этого заполняем её значениями
+                db.executeUpdate("CREATE TABLE Organization(id int, orgname varchar(128)," +
+                        " shortname varchar(128), orgboss varchar(128))");
+                // таблица для номеров телефонов organizations
+                db.executeUpdate("CREATE TABLE OrganizationTel(id int, telNumber int))");
+                //запись данных из созданных таблиц
+                fillDB(db,organizations);
+            }
+
+            try {
+                // запись данных в таблицу
+                fillDB(db,departments);
+            } catch (SQLException e) {
+                // если БД не существовала, то создаем таблицу
+                // и после этого заполняем её значениями
+                db.executeUpdate("CREATE TABLE Department(id int, departname varchar(128)," +
+                        " shortname varchar(128), boss varchar(128))");
+                // таблица для номеров телефонов departments
+                db.executeUpdate("CREATE TABLE DepatmentTel(id int, telNumber int))");
+                //запись данных из созданных таблиц
+                fillDB(db,departments);
+            }
+
             //вывод данных
-            ResultSet rs = db.executeQuery("SELECT * FROM Person");
-            String dataFromTable="";
-            while(rs.next()) {
-
-                dataFromTable=dataFromTable+rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getString(4)+" "+rs.getString(5);
-            }
-            String pr = dataFromTable;
-            int p=0;
+          //  String dataFromTable="";
+          //  ResultSet rs = db.executeQuery("SELECT * FROM Person");
+          //  while(rs.next()) {
+          //      dataFromTable=dataFromTable+rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getString(4)+" "+rs.getString(5);
+          //  }
 
         } catch (SQLException e) {
             Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
-    public  void fillDB(DerbyDBManager db, Persons persons) throws SQLException {
-        db.executeUpdatePersons(persons);
+    public  void fillDB(DerbyDBManager db, Object obj) throws SQLException {
+
+        if (obj instanceof Persons) db.executeUpdatePersons(persons);
+        if (obj instanceof Departments) db.executeUpdateDepartments(departments);
+        if (obj instanceof Organizations) db.executeUpdateOrganizations(organizations);
     }
 
 
+
+
+    //считываем person.xml
+  /*  public Collection<Person> readFiles() throws URISyntaxException {
+                try {
+                    ClassLoader classLoader = getClass().getClassLoader();
+                    URL url = classLoader.getResource("person.xml");
+                    file = new File(url.getPath());
+                    JAXBContext jaxbContext = JAXBContext.newInstance(Persons.class);
+                    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                    Object o = jaxbUnmarshaller.unmarshal(file);
+                     persons = (Persons) o;
+                    return persons.person;
+                } catch (Exception ex) {
+                    Logger.getLogger(FileService.class.getName())
+                            .log(Level.SEVERE, null, ex);
+                }
+                //если неудача - возвращаем null
+            return null;
+            }
+ */
 }

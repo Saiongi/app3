@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<organizations>
+    <organizationList>
+        <organization>
+            <id>1</id>
+            <orgBoss>Кудрявцев Сергей Анатоольевич</orgBoss>
+            <orgName>Департамент управления делами и контроля</orgName>
+            <orgTelNumbers>
+                <orgTelNumbers>1403897</orgTelNumbers>
+                <orgTelNumbers>1403837</orgTelNumbers>
+                <orgTelNumbers>1403827</orgTelNumbers>
+            </orgTelNumbers>
+            <shortName>Департамент УДК</shortName>
+        </organization>
+    </organizationList>
+</organizations>

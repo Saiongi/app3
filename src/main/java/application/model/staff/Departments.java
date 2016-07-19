@@ -14,6 +14,6 @@ import java.util.List;
 @XmlType(name = "Departments")
 @XmlRootElement
 public class Departments {
-    @XmlElementWrapper(name="departments", nillable = true)
+    @XmlElementWrapper(name="departmentList", nillable = true)
     public List<Department> department = new ArrayList<Department>();
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<departments>
+    <departmentList>
+        <department>
+            <id>1</id>
+            <boss>Кудрявцев Сергей Анатоольевич</boss>
+            <departName>Департамент управления делами и контроля</departName>
+            <shortName>Департамент УДК</shortName>
+            <telNumbers>
+                <telNumbers>1403897</telNumbers>
+                <telNumbers>1403837</telNumbers>
+                <telNumbers>1403827</telNumbers>
+            </telNumbers>
+        </department>
+    </departmentList>
+</departments>

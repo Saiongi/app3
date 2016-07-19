@@ -13,8 +13,8 @@ public class TestDoc {
         //Создаем hashmap для хранения классов и названий файлов
         Map<String,Class> staffMap = new HashMap<String,Class>();
         staffMap.put("person.xml", Persons.class);
-        staffMap.put("departments.xml", Departments.class);
-        staffMap.put("organizations.xml", Organizations.class);
+        staffMap.put("department.xml", Departments.class);
+        staffMap.put("organization.xml", Organizations.class);
 
         FileService fileService = new FileService();
          Persons person =  fileService.readFiles(staffMap);
