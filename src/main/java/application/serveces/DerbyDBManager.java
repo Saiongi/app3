@@ -35,8 +35,7 @@ public class DerbyDBManager {
         }
     }
     //проверяем, существует ли бд
-    private Boolean dbExists()
-    {
+    private Boolean dbExists() {
         Boolean exists = false ;
         try {
             Class.forName(driver) ;
@@ -51,36 +50,29 @@ public class DerbyDBManager {
 
     // запрос на обновление базы данных  (INSERT, UPDATE, CREATE TABLE и т.п.)
     public void executeUpdate(String sql) throws SQLException {
-        Statement stmt = con.createStatement() ;
-        int count = stmt.executeUpdate(sql) ;
-        stmt.close() ;
+        PreparedStatement prstmt = con.prepareStatement(sql);
+        int count = prstmt.executeUpdate();
+        prstmt.close();
     }
-
-
-
     // запрос на выборку данных из базы
     public ResultSet executeQuery(String sql) throws SQLException {
-        Statement stmt = con.createStatement() ;
-        ResultSet result = stmt.executeQuery(sql) ;
+        PreparedStatement prstmt = con.prepareStatement(sql);
+        ResultSet result = prstmt.executeQuery() ;
         return result;
     }
-    PreparedStatement stmt = null;
+    //добавление нескольких person(persons)
     public void executeUpdatePersons(Persons persons) throws SQLException {
-        PreparedStatement prstmt = null;
-        ResultSet result;
         for (Person person: persons.person) {
-            //stmt = con.createStatement() ;
-           // result = stmt.executeQuery("SELECT * FROM person WHERE id = findId ") ;
-            prstmt = con.prepareStatement("SELECT * FROM Person WHERE id =?");
-            prstmt.setInt(1, person.getId());
-            result = prstmt.executeQuery();
-           // result.next();
-           // Boolean str=result.getBoolean("id");
-           // prstmt.close();
-            //если в результате запроса возвратилось id  то переходим к след элементу
-            if (result.wasNull()) {
-                //иначе добавляем элемент
+            executeUpdatePerson(person);
+        }
+    }
+    //добавление person
+    public void executeUpdatePerson(Person person) throws SQLException {
+        PreparedStatement prstmt = null;
 
+            //если в результате запроса возвратилось id  то переходим к след элементу
+            if (!hasElementInTable(person.getId(), "person")){
+                //иначе добавляем элемент
                 prstmt = con.prepareStatement(
                         "INSERT INTO Person " +
                                 "(id, name, secondname, surname, position) " +
@@ -92,69 +84,59 @@ public class DerbyDBManager {
                 prstmt.setString(5, person.getPosition());
                 prstmt.execute();
             }
+
+    }
+    //добавление нескольких department(departments)
+    public void executeUpdateDepartments(Departments departments) throws SQLException {
+        for (Department department: departments.department) {
+          executeUpdateDepartment(department);  //если в результате запроса возвратилось id  то переходим к след элементу
         }
     }
-
-    public void executeUpdateDepartments(Departments departments) throws SQLException {
+    //добавление department
+    public void executeUpdateDepartment(Department department) throws SQLException {
         PreparedStatement prstmt = null;
-        PreparedStatement stmtTel = null;
-        ResultSet result;
-
-
-        for (Department department: departments.department) {
-            prstmt = con.prepareStatement("SELECT * FROM Department WHERE id =?");
+        PreparedStatement prstmtTel = null;
+        if (!hasElementInTable(department.getId(), "department")){
+            prstmt = con.prepareStatement(
+                    "INSERT INTO Department " +
+                            "(id, departname, shortname, boss) " +
+                            "VALUES (?, ?, ?, ?)");
             prstmt.setInt(1, department.getId());
-            result = prstmt.executeQuery();
-            //если в результате запроса возвратилось id  то переходим к след элементу
-            if (result.wasNull()) {
-                prstmt = con.prepareStatement(
-                        "INSERT INTO Department " +
-                                "(id, name, secondname, surname, position) " +
-                                "VALUES (?, ?, ?, ?, ?)");
-                prstmt.setInt(1, department.getId());
-                prstmt.setString(2, department.getDepartName());
-                prstmt.setString(3, department.getShortName());
-                prstmt.setString(4, department.getBoss());
-                //       stmt.setString(5, department.getTelNumbers());
-                prstmt.execute();
+            prstmt.setString(2, department.getDepartName());
+            prstmt.setString(3, department.getShortName());
+            prstmt.setString(4, department.getBoss());
+            prstmt.execute();
 
-                ArrayList<Integer> depTel = department.getTelNumbers();
+            ArrayList<Integer> depTel = department.getTelNumbers();
 
-                //записываем номера телефонов в отдельную таблицу
-                for (int i = 0; i < depTel.size(); i++) {
-                    stmtTel = con.prepareStatement(
-                            "INSERT INTO DepartmentTel " +
-                                    "(id, telNumber) " +
-                                    "VALUES (?, ?)");
-                    stmtTel.setInt(1, department.getId());
-                    stmtTel.setInt(2, depTel.get(i));
-                }
+            //записываем номера телефонов в отдельную таблицу
+            for (int i = 0; i < depTel.size(); i++) {
+                prstmtTel = con.prepareStatement(
+                        "INSERT INTO DepartmentTel " +
+                                "(id, telNumber) " +
+                                "VALUES (?, ?)");
+                prstmtTel.setInt(1, department.getId());
+                prstmtTel.setInt(2, depTel.get(i));
+                prstmtTel.execute();
             }
         }
     }
-
+    //добавление нескольких organization(organizations)
     public void executeUpdateOrganizations(Organizations organizations) throws SQLException {
-        PreparedStatement prstmt = null;
-        PreparedStatement stmtTel = null;
-        Statement stmt = null ;
-        ResultSet result;
-        int findId;
-
-
 
         for (Organization organization: organizations.organization) {
-            stmt = con.createStatement() ;
-            findId = organization.getId();
-            result = stmt.executeQuery("SELECT * FROM Organization WHERE id = findId") ;
-            //если в результате запроса возвратилось id  то переходим к след элементу
-            if (result.getString("id")!= null) {
-                break;
-                //иначе добавляем элемент
-            }else {
+            executeUpdateOrganization(organization);
+        }
+    }
+    //добавление organization
+    public void executeUpdateOrganization(Organization organization) throws SQLException {
+        PreparedStatement prstmt = null;
+        PreparedStatement prstmtTel = null;
+            if (!hasElementInTable(organization.getId(), "organization")){
                 prstmt = con.prepareStatement(
                         "INSERT INTO Departments " +
-                                "(id, name, secondname, surname, position) " +
-                                "VALUES (?, ?, ?, ?, ?)");
+                                "(id, orgname, shortname, boss) " +
+                                "VALUES (?, ?, ?, ?)");
                 prstmt.setInt(1, organization.getId());
                 prstmt.setString(2, organization.getOrgName());
                 prstmt.setString(3, organization.getShortName());
@@ -162,19 +144,223 @@ public class DerbyDBManager {
                 prstmt.execute();
 
                 ArrayList<Integer> orgTel = organization.getOrgTelNumbers();
-
                 //записываем номера телефонов в отдельную таблицу
                 for (int i = 0; i < orgTel.size(); i++) {
-                    stmtTel = con.prepareStatement(
+                    prstmtTel = con.prepareStatement(
                             "INSERT INTO OrganizationTel " +
                                     "(id, telNumber) " +
                                     "VALUES (?, ?)");
-                    stmtTel.setInt(1, organization.getId());
-                    stmtTel.setInt(2, orgTel.get(i));
-                    stmtTel.execute();
+                    prstmtTel.setInt(1, organization.getId());
+                    prstmtTel.setInt(2, orgTel.get(i));
+                    prstmtTel.execute();
                 }
             }
 
-        }
+
     }
+    //проверка элемента на наличие(принимает id элемента и название таблицы, в которой проверяем наличие)
+    public boolean hasElementInTable (int id, String tableName) {
+        boolean res = false;
+        PreparedStatement prstmt = null;
+        try {
+            prstmt = con.prepareStatement("SELECT * FROM "+ tableName +" WHERE id = ?");
+            prstmt.setInt(1, id);
+            ResultSet result = prstmt.executeQuery();
+            while (result.next()) {
+                res = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+    //получаем persons(вся таблица)
+    public Persons getPersonsFromDB(){
+        ResultSet rs = null;
+        Persons persons = new Persons();
+        Person person = new Person();
+        try {
+            rs = this.executeQuery("SELECT * FROM Person");
+            while (rs.next()) {
+                person.setId(rs.getInt("id"));
+                person.setName(rs.getString("name"));
+                person.setSecondName(rs.getString("secondname"));
+                person.setSurname(rs.getString("surname"));
+                person.setSurname(rs.getString("position"));
+                persons.person.add(person);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return persons;
+    }
+    //получаем person по id
+    public Person getPersonFromDB(int id){
+        PreparedStatement prstmt = null;
+        ResultSet rs = null;
+        Person person = new Person();
+        try {
+            prstmt = con.prepareStatement(
+                    "SELECT * FROM Person WHERE id = ?");
+            prstmt.setInt(1, id);
+            rs = prstmt.executeQuery();
+            while (rs.next()) {
+                person.setId(rs.getInt("id"));
+                person.setName(rs.getString("name"));
+                person.setSecondName(rs.getString("secondname"));
+                person.setSurname(rs.getString("surname"));
+                person.setSurname(rs.getString("position"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return person;
+    }
+    //получаем departments(вся таблица)
+    public Departments getDepartmentsFromDB(){
+        Departments departments = new Departments();
+        Department department = new Department();
+        ResultSet rs2  = null;
+        ResultSet rs = null;
+        try {
+            rs = this.executeQuery("SELECT * FROM Department");
+            while (rs.next()) {
+                department.setId(rs.getInt("id"));
+                department.setDepartName(rs.getString("departname"));
+                department.setShortName(rs.getString("shortname"));
+                department.setBoss(rs.getString("boss"));
+
+                rs2 = this.executeQuery("SELECT telNumber FROM DepartmentTel WHERE id="+rs.getInt("id")+"");
+                ArrayList<Integer> depTel = new ArrayList<Integer>();
+                while (rs2.next()) {
+                    depTel.add(rs2.getInt("telNumber"));
+                }
+                department.setTelNumbers(depTel);
+                departments.department.add(department);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return departments;
+    }
+    //получаем department по id
+    public Department getDepartmentFromDB(int id){
+        PreparedStatement prstmt = null;
+        Department department = new Department();
+        ResultSet rs2  = null;
+        ResultSet rs = null;
+        try {
+            prstmt = con.prepareStatement(
+                    "SELECT * FROM Department WHERE id = ?");
+            prstmt.setInt(1, id);
+            rs = prstmt.executeQuery();
+
+            while (rs.next()) {
+                department.setId(rs.getInt("id"));
+                department.setDepartName(rs.getString("departname"));
+                department.setShortName(rs.getString("shortname"));
+                department.setBoss(rs.getString("boss"));
+
+                rs2 = this.executeQuery("SELECT telNumber FROM DepartmentTel WHERE id="+rs.getInt("id")+"");
+                ArrayList<Integer> depTel = new ArrayList<Integer>();
+                while (rs2.next()) {
+                    depTel.add(rs2.getInt("telNumber"));
+                }
+                department.setTelNumbers(depTel);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return department;
+    }
+    //получаем organizations(вся таблица)
+    public Organizations getOrganizationsFromDB(){
+        Organizations organizations = new Organizations();
+        Organization organization = new Organization();
+        ResultSet rs2  = null;
+        ResultSet rs = null;
+        try {
+            rs = this.executeQuery("SELECT * FROM Organization");
+            while (rs.next()) {
+                organization.setId(rs.getInt("id"));
+                organization.setOrgName(rs.getString("orgname"));
+                organization.setShortName(rs.getString("shortname"));
+                organization.setOrgBoss(rs.getString("orgboss"));
+
+                rs2 = this.executeQuery("SELECT telNumber FROM OrganizationTel WHERE id="+rs.getInt("id")+"");
+                ArrayList<Integer> orgTel = new ArrayList<Integer>();
+                while (rs2.next()) {
+                    orgTel.add(rs2.getInt("telNumber"));
+                }
+                organization.setOrgTelNumbers(orgTel);
+                organizations.organization.add(organization);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return organizations;
+    }
+    //получаем organization по id
+    public Organization getOrganizationFromDB(int id){
+        PreparedStatement prstmt = null;
+        Organization organization = new Organization();
+        ResultSet rs2  = null;
+        ResultSet rs = null;
+        try {
+            prstmt = con.prepareStatement(
+                    "SELECT * FROM Department WHERE id = ?");
+            prstmt.setInt(1, id);
+            rs = prstmt.executeQuery();
+            while (rs.next()) {
+                organization.setId(rs.getInt("id"));
+                organization.setOrgName(rs.getString("orgname"));
+                organization.setShortName(rs.getString("shortname"));
+                organization.setOrgBoss(rs.getString("orgboss"));
+
+                rs2 = this.executeQuery("SELECT telNumber FROM OrganizationTel WHERE id="+rs.getInt("id")+"");
+                ArrayList<Integer> orgTel = new ArrayList<Integer>();
+                while (rs2.next()) {
+                    orgTel.add(rs2.getInt("telNumber"));
+                }
+                organization.setOrgTelNumbers(orgTel);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return organization;
+    }
+
+/*
+    public boolean hasDepartment(int id) {
+        boolean res = false;
+        PreparedStatement prstmt = null;
+        try {
+            prstmt = con.prepareStatement("SELECT * FROM Department WHERE id = ?");
+            prstmt.setInt(1, id);
+            ResultSet result = prstmt.executeQuery();
+            while (result.next()) {
+                res = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+    public boolean hasOrganization(int id) {
+        boolean res = false;
+        PreparedStatement prstmt = null;
+        try {
+            prstmt = con.prepareStatement("SELECT * FROM Organization WHERE id = ?");
+            prstmt.setInt(1, id);
+            ResultSet result = prstmt.executeQuery();
+            while (result.next()) {
+                res = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+*/
 }

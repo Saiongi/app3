@@ -2,7 +2,12 @@ package application.serveces;
 
 
 import application.model.document.Document;
+import application.model.staff.Departments;
+import application.model.staff.Organizations;
 import application.model.staff.Person;
+import application.model.staff.Persons;
+import application.serveces.factories.TestDerby;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.net.URISyntaxException;
@@ -26,26 +31,18 @@ public class StaffController {
     @GET
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
     @Path("/get")
-    public Collection<Person> getJSONPersons(){
-        personCollection = fileService.personsCollection;
-
-        fileService.createDBConnection();
-        return  personCollection;
-
-
-          //  ResultSet rs = fileService.db.executeQuery("SELECT * FROM Person ");
-
-
+    public Persons getJSONPersons() throws SQLException {
+       fileService.createDBConnection();
+       Persons persons = fileService.db.getPersonsFromDB();
+       return persons;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_XML+";charset=UTF-8")
     @Path("/get/{id}")
     public TreeSet<Document> getXMLDocuments(@PathParam("id") int id){
-
         document = fileService.findDocId(fileService.allDoc, id);
             return document;
-
     }
 
 

@@ -22,9 +22,6 @@ import java.util.logging.Logger;
  */
 
 public class FileService {
-
-
-
      private static Connection con = null;
     // переменная для хранения Persons
     Collection<Person> personsCollection;
@@ -47,7 +44,7 @@ public class FileService {
 FileService() throws URISyntaxException {
 
     this.readFiles();
-    personsCollection = persons.person;
+
     //создаем экземпляр DocService
     docService = new DocService();
     //сохраняем person в docFieldStorage
@@ -58,7 +55,7 @@ FileService() throws URISyntaxException {
      allDoc = createDocuments();
 
 }
-
+// выгрузка данных оргштатных едениц из xml файла
     public void readFiles() {
         //считываем сохраняем данные из файлов
         //Создаем hashmap для хранения классов и названий файлов
@@ -97,7 +94,6 @@ FileService() throws URISyntaxException {
         }
 
     }
-
     //ищем документ по id
     public TreeSet<Document> findDocId(TreeSet<Document> allDoc, int findId){
         Map<Integer, TreeSet<Document>> docsByPersonMap = new TreeMap<Integer, TreeSet<Document>>();
@@ -123,7 +119,7 @@ FileService() throws URISyntaxException {
         //если документы найдены , возвращаем коллекцию
        }else return idFindDoc;
     }
-
+    //создание документов
     public TreeSet<Document>  createDocuments(){
         //доп масссив для случайной генерации одного из документов
         Class[] classDoc = new Class[3];
@@ -144,25 +140,8 @@ FileService() throws URISyntaxException {
         //возвращаем TreeSet с документами
         return allDoc;
     }
-
-    public void insertPerson(Person person) throws SQLException {
-
-        PreparedStatement stmt = null;
-
-            stmt = con.prepareStatement(
-                    "INSERT INTO person " +
-                            "(id, name, secondname, surname, position) " +
-                            "VALUES (?, ?, ?, ?, ?)");
-            stmt.setInt(1, person.getId());
-            stmt.setString(2, person.getName());
-            stmt.setString(3, person.getSecondName());
-            stmt.setString(4, person.getSurname());
-            stmt.setString(5, person.getPosition());
-            stmt.execute();
-    }
-
+    //соединение с бд, вызов метода записи данных из файлов в бд
     public  void createDBConnection() {
-
 
         try {
 
@@ -205,25 +184,16 @@ FileService() throws URISyntaxException {
                 fillDB(db,departments);
             }
 
-            //вывод данных
-          //  String dataFromTable="";
-          //  ResultSet rs = db.executeQuery("SELECT * FROM Person");
-          //  while(rs.next()) {
-          //      dataFromTable=dataFromTable+rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getString(4)+" "+rs.getString(5);
-          //  }
-
         } catch (SQLException e) {
             Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-
     public  void fillDB(DerbyDBManager db, Object obj) throws SQLException {
 
         if (obj instanceof Persons) db.executeUpdatePersons(persons);
         if (obj instanceof Departments) db.executeUpdateDepartments(departments);
         if (obj instanceof Organizations) db.executeUpdateOrganizations(organizations);
     }
-
 
 
 
