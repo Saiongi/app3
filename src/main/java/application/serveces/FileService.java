@@ -23,8 +23,6 @@ import java.util.logging.Logger;
 
 public class FileService {
      private static Connection con = null;
-    // переменная для хранения Persons
-    Collection<Person> personsCollection;
     // переменная для хранения Departments
     Departments departments;
     // переменная для хранения Organizations
@@ -39,20 +37,18 @@ public class FileService {
     TreeSet<Document> allDoc;
     //для хранения документов с искомым id
     TreeSet<Document> idFindDoc;
-
-    DerbyDBManager db;
-FileService() throws URISyntaxException {
+ //   DerbyDBManager db;
+public FileService() throws URISyntaxException {
 
     this.readFiles();
-
+//    db = new DerbyDBManager("ApplicationDB");
     //создаем экземпляр DocService
     docService = new DocService();
     //сохраняем person в docFieldStorage
     docService.savePersons(persons);
     //создаем класс derbymanager и передаем ему имя бд
-    db = new DerbyDBManager("ApplicationDB");
     //создаем документы
-     allDoc = createDocuments();
+    allDoc = createDocuments();
 
 }
 // выгрузка данных оргштатных едениц из xml файла
@@ -141,6 +137,7 @@ FileService() throws URISyntaxException {
         return allDoc;
     }
     //соединение с бд, вызов метода записи данных из файлов в бд
+    /*
     public  void createDBConnection() {
 
         try {
@@ -188,16 +185,27 @@ FileService() throws URISyntaxException {
             Logger.getLogger(FileService.class.getName()).log(Level.SEVERE, null, e);
         }
     }
+    */
     public  void fillDB(DerbyDBManager db, Object obj) throws SQLException {
 
         if (obj instanceof Persons) db.executeUpdatePersons(persons);
         if (obj instanceof Departments) db.executeUpdateDepartments(departments);
         if (obj instanceof Organizations) db.executeUpdateOrganizations(organizations);
     }
+    //геттеры используются для servletcontextexample
+    public Persons getPersons(){
+        return this.persons;
+    }
+    public Departments getDepartments(){
+        return this.departments;
+    }
+    public Organizations getOrganizations(){
+        return this.organizations;
+    }
+}
 
 
-
-    //считываем person.xml
+//считываем person.xml
   /*  public Collection<Person> readFiles() throws URISyntaxException {
                 try {
                     ClassLoader classLoader = getClass().getClassLoader();
@@ -216,4 +224,3 @@ FileService() throws URISyntaxException {
             return null;
             }
  */
-}

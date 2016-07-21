@@ -178,15 +178,16 @@ public class DerbyDBManager {
     public Persons getPersonsFromDB(){
         ResultSet rs = null;
         Persons persons = new Persons();
-        Person person = new Person();
+
         try {
             rs = this.executeQuery("SELECT * FROM Person");
             while (rs.next()) {
+                Person person = new Person();
                 person.setId(rs.getInt("id"));
                 person.setName(rs.getString("name"));
                 person.setSecondName(rs.getString("secondname"));
                 person.setSurname(rs.getString("surname"));
-                person.setSurname(rs.getString("position"));
+                person.setPosition(rs.getString("position"));
                 persons.person.add(person);
             }
         } catch (SQLException e) {
@@ -329,6 +330,39 @@ public class DerbyDBManager {
             e.printStackTrace();
         }
         return organization;
+    }
+
+    public void createOrganizationTables(){
+
+        try {
+            this.executeUpdate("CREATE TABLE Organization(id int, orgname varchar(128)," +
+                    " shortname varchar(128), orgboss varchar(128))");
+            // таблица для номеров телефонов organizations
+            this.executeUpdate("CREATE TABLE OrganizationTel(id int, telNumber int))");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createDepartmentTables(){
+        try {
+            this.executeUpdate("CREATE TABLE Department(id int, departname varchar(128)," +
+                    " shortname varchar(128), boss varchar(128))");
+            // таблица для номеров телефонов departments
+            this.executeUpdate("CREATE TABLE DepatmentTel(id int, telNumber int))");
+            //запись данных из созданных таблиц
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    };
+    public void createPersonTable(){
+        try {
+            this.executeUpdate("CREATE TABLE Person(id int, name varchar(128)," +
+                    " secondname varchar(128), surname varchar(128), position varchar(128))");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 /*
