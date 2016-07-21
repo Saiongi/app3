@@ -3,6 +3,7 @@ package application.servlets;
 import application.serveces.DerbyDBManager;
 import application.serveces.FileService;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.net.URISyntaxException;
@@ -14,15 +15,20 @@ import java.util.logging.Logger;
  * Created by Светлана on 20.07.2016.
  */
 public class ServletContextListenerDB implements ServletContextListener {
-    FileService fileService;
-    DerbyDBManager derbyDBManager;
-  //  public DerbyDBManager getDerbyDBManager(){
-  //      this.derbyDBManager;
-  //      return DerbyDBManager;
-  //  }
+    ServletContext context;
     @Override
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
-        derbyDBManager = new DerbyDBManager("ApplicationDB");
+    public void contextInitialized(ServletContextEvent contextEvent) {
+
+        FileService fileService = null;
+        try {
+            fileService = new FileService();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        DerbyDBManager derbyDBManager=new DerbyDBManager("ApplicationDB");
+
+        context = contextEvent.getServletContext();
+
         fileService.readFiles();
         try {
             fileService = new FileService();
@@ -69,7 +75,8 @@ public class ServletContextListenerDB implements ServletContextListener {
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    public void contextDestroyed(ServletContextEvent contextEvent) {
+        context = contextEvent.getServletContext();
 
     }
 }
